@@ -33,6 +33,22 @@ def index():
     return render_template('index.html', products=products)
 
 
+@app.route('/remove/<int:item_id>')
+@login_required
+def remove_from_cart(item_id):
+    # Find the cart item
+    item_to_remove = CartItem.query.get(item_id)
+
+    # Security check: Ensure the item exists and belongs to the current user
+    if item_to_remove and item_to_remove.user_id == current_user.id:
+        db.session.delete(item_to_remove)
+        db.session.commit()
+        flash('Item removed from cart.')
+    else:
+        flash('Error: Could not remove item.')
+
+    return redirect(url_for('cart'))
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
