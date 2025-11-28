@@ -12,7 +12,8 @@ class User(UserMixin, db.Model):
     cart_items = db.relationship('CartItem', backref='buyer', lazy=True)
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        # CHANGED: Added method='pbkdf2:sha256' to fix the AttributeError
+        self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
@@ -27,12 +28,11 @@ class Product(db.Model):
     image_url = db.Column(db.String(500), nullable=True)
 
 
-# Shopping Cart Class (Association between User and Product)
+# Shopping Cart Class
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     quantity = db.Column(db.Integer, default=1)
 
-    # Link to the actual product so we can get price/name easily
     product = db.relationship('Product')
