@@ -8,18 +8,20 @@ db = SQLAlchemy()
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
-    password_hash = db.Column(db.String(150), nullable=False)
-    cart_items = db.relationship('CartItem', backref='buyer', lazy=True)
+    password_hash = db.Column(db.String(256), nullable=False)
+
+    cart_items = db.relationship('CartItem', backref='buyer', lazy=True, cascade="all, delete-orphan")
 
     def set_password(self, password):
-        # CHANGED: Added method='pbkdf2:sha256' to fix the AttributeError
         self.password_hash = generate_password_hash(password, method='pbkdf2:sha256')
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def __repr__(self):
+        return f"<User {self.username}>"
 
-# Product Class
+
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
@@ -27,8 +29,10 @@ class Product(db.Model):
     description = db.Column(db.String(500), nullable=True)
     image_url = db.Column(db.String(500), nullable=True)
 
+    def __repr__(self):
+        return f"<Product {self.name} - ${self.price}>"
 
-# Shopping Cart Class
+
 class CartItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -36,3 +40,6 @@ class CartItem(db.Model):
     quantity = db.Column(db.Integer, default=1)
 
     product = db.relationship('Product')
+
+    def __repr__(self):
+        return f"<CartItem User:{self.user_id} Product:{self.product_id} Qty:{self.quantity}>"
