@@ -34,11 +34,11 @@
                     <td class="align-middle">{{ item.quantity }}</td>
                     <td class="align-middle fw-bold">${{ "%.2f"|format(item.product.price * item.quantity) }}</td>
                     <td class="align-middle text-center">
-                        <a href="{{ url_for('remove_from_cart', item_id=item.id) }}"
-                           class="btn btn-outline-danger btn-sm"
-                           title="Remove this item">
-                            Remove
-                        </a>
+                        <form action="{{ url_for('remove_from_cart', item_id=item.id) }}" method="POST" class="d-inline">
+                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Remove this item">
+                                Remove
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}
@@ -56,9 +56,11 @@
     <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
         &larr; Continue Shopping
     </a>
-    <a href="{{ url_for('checkout') }}" class="btn btn-success btn-lg shadow">
-        Proceed to Checkout &rarr;
-    </a>
+    <form action="{{ url_for('checkout') }}" method="POST" class="d-inline">
+        <button type="submit" class="btn btn-success btn-lg shadow">
+            Proceed to Checkout &rarr;
+        </button>
+    </form>
 </div>
 
 {% else %}
